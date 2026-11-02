@@ -5,8 +5,9 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
-const userRoutes = require("./routes/userRoutes");
-const aiRoutes = require("./routes/aiRoutes");
+const chatRoutes = require("./routes/chatRoutes");
+const historyRoutes = require("./routes/historyRoutes");
+const pdfRoutes = require("./routes/pdfRoutes");
 
 const app = express();
 
@@ -26,8 +27,9 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/ai", aiRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/history", historyRoutes);
+app.use("/api/pdf", pdfRoutes);
 
 const PORT = process.env.PORT || 5000;
 
