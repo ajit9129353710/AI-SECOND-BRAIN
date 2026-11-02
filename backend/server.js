@@ -12,13 +12,12 @@ const pdfRoutes = require("./routes/pdfRoutes");
 const historyRoutes = require("./routes/historyRoutes");
 
 const app = express();
-
 app.use(cors({
-origin: [
-"http://localhost:5173",
-"https://ajit-t8ig.vercel.app"
-],
-credentials: true
+  origin: [
+    "http://localhost:5173",
+    "https://ajit-t8ig-61qfaphji-ctrl-z1.vercel.app"
+  ],
+  credentials: true
 }));
 
 app.use(express.json({ limit: "1mb" }));
