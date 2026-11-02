@@ -60,14 +60,25 @@ try {
     throw new Error(data.message || "Signup failed.");
   }
 
-  sessionStorage.setItem("token", data.token);
-  sessionStorage.setItem("user", JSON.stringify(data.user));
+  if (!data.token) {
+    throw new Error("Authentication token not received.");
+  }
 
-  navigate("/dashboard");
+  // Save authentication details
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("user", JSON.stringify(data.user));
+
+  // Remove old session storage
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
+
+  // Open dashboard
+  navigate("/dashboard", { replace: true });
+
 } catch (err) {
   setError(
     err.message === "Failed to fetch"
-      ? "Backend is not running. Please start the backend server."
+      ? "Unable to connect to backend. Please try again."
       : err.message
   );
 } finally {
@@ -82,8 +93,11 @@ return (
 <span className="auth-brand-icon">
 <Brain size={25} />
 </span>
-<span>Second<span className="brand-highlight">Brain</span></span>
-</Link>
+
+    <span>
+      Second<span className="brand-highlight">Brain</span>
+    </span>
+  </Link>
 
   <div className="auth-card">
     <div className="auth-icon">
@@ -91,6 +105,7 @@ return (
     </div>
 
     <h1>Create your account</h1>
+
     <p className="auth-subtitle">
       Start building your personal AI knowledge space.
     </p>
@@ -99,8 +114,10 @@ return (
 
     <form onSubmit={handleSubmit}>
       <label htmlFor="name">Full name</label>
+
       <div className="auth-input-wrap">
         <User size={19} />
+
         <input
           id="name"
           type="text"
@@ -114,8 +131,10 @@ return (
       </div>
 
       <label htmlFor="signup-email">Email address</label>
+
       <div className="auth-input-wrap">
         <Mail size={19} />
+
         <input
           id="signup-email"
           type="email"
@@ -129,8 +148,10 @@ return (
       </div>
 
       <label htmlFor="signup-password">Password</label>
+
       <div className="auth-input-wrap">
         <Lock size={19} />
+
         <input
           id="signup-password"
           type="password"
@@ -150,6 +171,7 @@ return (
         disabled={loading}
       >
         {loading ? "Creating account..." : "Create Account"}
+
         {!loading && <ArrowRight size={19} />}
       </button>
     </form>

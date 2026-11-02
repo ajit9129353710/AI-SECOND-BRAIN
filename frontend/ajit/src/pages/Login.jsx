@@ -22,40 +22,52 @@ setForm({
 };
 
 const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
+e.preventDefault();
+setError("");
+setLoading(true);
 
-  try { 
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/auth/login`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: form.email.trim(),
-          password: form.password,
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Login failed.");
+try {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/auth/login`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: form.email.trim(),
+        password: form.password,
+      }),
     }
+  );
 
-    sessionStorage.setItem("token", data.token);
-    sessionStorage.setItem("user", JSON.stringify(data.user));
+  const data = await response.json();
 
-    navigate("/dashboard"); 
-  } catch (err) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
+  if (!response.ok) {
+    throw new Error(data.message || "Login failed.");
   }
+
+  if (!data.token) {
+    throw new Error("Authentication token not received.");
+  }
+
+  // Save authentication details
+  localStorage.setItem("token", data.token);
+  localStorage.setItem("user", JSON.stringify(data.user));
+
+  // Remove old session storage
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
+
+  // Open dashboard
+  navigate("/dashboard", { replace: true });
+
+} catch (err) {
+  setError(err.message || "Something went wrong.");
+} finally {
+  setLoading(false);
+}
+
 };
 
 return (
@@ -64,7 +76,9 @@ return (
 <span className="auth-brand-icon">
 <Brain size={25} />
 </span>
-<span>Second<span className="brand-highlight">Brain</span></span>
+<span>
+Second<span className="brand-highlight">Brain</span>
+</span>
 </Link>
 
   <div className="auth-card">
@@ -73,6 +87,7 @@ return (
     </div>
 
     <h1>Welcome back</h1>
+
     <p className="auth-subtitle">
       Login to continue exploring your knowledge.
     </p>
@@ -81,8 +96,10 @@ return (
 
     <form onSubmit={handleSubmit}>
       <label htmlFor="login-email">Email address</label>
+
       <div className="auth-input-wrap">
         <Mail size={19} />
+
         <input
           id="login-email"
           type="email"
@@ -96,8 +113,10 @@ return (
       </div>
 
       <label htmlFor="login-password">Password</label>
+
       <div className="auth-input-wrap">
         <Lock size={19} />
+
         <input
           id="login-password"
           type="password"
@@ -116,6 +135,7 @@ return (
         disabled={loading}
       >
         {loading ? "Logging in..." : "Login"}
+
         {!loading && <ArrowRight size={19} />}
       </button>
     </form>
