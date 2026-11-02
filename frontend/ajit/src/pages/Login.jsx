@@ -22,45 +22,40 @@ setForm({
 };
 
 const handleSubmit = async (e) => {
-e.preventDefault();
-setError("");
-
-try {
+  e.preventDefault();
+  setError("");
   setLoading(true);
-const response = await fetch(
-  `${import.meta.env.VITE_API_URL}/api/auth/login`,
-  {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: form.email.trim(),
-        password: form.password,
-      }),
+
+  try { 
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/auth/login`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: form.email.trim(),
+          password: form.password,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Login failed.");
     }
-  );
 
-  const data = await response.json();
+    sessionStorage.setItem("token", data.token);
+    sessionStorage.setItem("user", JSON.stringify(data.user));
 
-  if (!response.ok) {
-    throw new Error(data.message || "Login failed.");
+    navigate("/dashboard"); 
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
   }
-
-  sessionStorage.setItem("token", data.token);
-  sessionStorage.setItem("user", JSON.stringify(data.user));
-
-  navigate("/dashboard");
-} catch (err) {
-  setError(
-    err.message === "Failed to fetch"
-      ? "Backend is not running. Please start the backend server."
-      : err.message
-  );
-} finally {
-  setLoading(false);
-}
-
 };
 
 return (
