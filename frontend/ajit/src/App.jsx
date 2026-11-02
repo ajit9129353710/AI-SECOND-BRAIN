@@ -3,6 +3,7 @@ BrowserRouter,
 Routes,
 Route,
 Navigate,
+useLocation
 } from "react-router-dom";
 
 import Home from "./pages/Home";
@@ -10,33 +11,66 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 
-function App() {
+function AppRoutes() {
+const location = useLocation();
+
+const token = localStorage.getItem("token");
+
 return (
-<BrowserRouter>
 <Routes>
 <Route path="/" element={<Home />} />
 
-    <Route path="/login" element={<Login />} />
-    <Route path="/signup" element={<Signup />} />
+  <Route
+    path="/login"
+    element={
+      token ? (
+        <Navigate to="/dashboard" replace />
+      ) : (
+        <Login />
+      )
+    }
+  />
 
-    <Route
-      path="/dashboard"
-      element={
-        sessionStorage.getItem("token") ? (
-          <Dashboard />
-        ) : (
-          <Navigate to="/login" replace />
-        )
-      }
-    />
+  <Route
+    path="/signup"
+    element={
+      token ? (
+        <Navigate to="/dashboard" replace />
+      ) : (
+        <Signup />
+      )
+    }
+  />
 
-    <Route
-      path="*"
-      element={<Navigate to="/" replace />}
-    />
-  </Routes>
+  <Route
+    path="/dashboard"
+    element={
+      token ? (
+        <Dashboard />
+      ) : (
+        <Navigate
+          to="/login"
+          replace
+          state={{ from: location }}
+        />
+      )
+    }
+  />
+
+  <Route
+    path="*"
+    element={<Navigate to="/" replace />}
+  />
+</Routes>
+
+);
+}
+
+function App() {
+return (
+<BrowserRouter>
+<AppRoutes />
 </BrowserRouter>
-
 );
 }
 
