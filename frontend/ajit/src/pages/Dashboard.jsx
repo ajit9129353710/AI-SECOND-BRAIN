@@ -14,8 +14,7 @@ History,
 RefreshCw,
 } from "lucide-react";
 import "./Dashboard.css";
-
-const API_URL = "${import.meta.env.VITE_API_URL}/api";
+const API_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 function Dashboard() {
 const navigate = useNavigate();
